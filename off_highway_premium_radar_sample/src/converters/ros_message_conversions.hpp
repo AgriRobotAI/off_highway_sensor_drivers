@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <numbers>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -60,7 +59,7 @@ namespace off_highway_premium_radar_sample
 
 using namespace off_highway_premium_radar_sample_msgs;  // NOLINT
 
-static constexpr double kDegToRad = std::numbers::pi / 180.0;
+static constexpr double kDegToRad = M_PI / 180.0;
 static constexpr double kRadToDeg = 1.0 / kDegToRad;
 
 // To ROS message
@@ -282,7 +281,7 @@ auto to_msg(const LocationAttributes & d, const rclcpp::Time stamp, const std::s
   mounting_pose.position.z = d.loc_atr_mounting_position.LocAtr_SenPosZ;
 
   tf2::Quaternion q_tf2;
-  double roll = d.loc_atr_mounting_position.LocAtr_SenOrient == -1 ? std::numbers::pi : 0.;
+  double roll = d.loc_atr_mounting_position.LocAtr_SenOrient == -1 ? M_PI : 0.;
   q_tf2.setRPY(
     roll, d.loc_atr_mounting_position.LocAtr_SenPosEle,
     d.loc_atr_mounting_position.LocAtr_SenPosAzi);

@@ -14,9 +14,12 @@
 
 #include "off_highway_premium_radar_sample/pdu_definitions.hpp"
 
+#if __has_include(<endian.h>)
 #include <endian.h>
+#elif __has_include(<net/netbyte.h>)
+#include <net/netbyte.h>
+#endif
 
-#include <bit>
 #include <cstring>
 
 #include "helper.hpp"
@@ -72,8 +75,8 @@ void LocData_Packet_i_j::check()
 }
 
 LocationDataPdu::LocationDataPdu(const std::array<uint8_t, kPduSize> & buffer)
-: LocationDataPdu(std::bit_cast<LocationDataPdu>(buffer))
 {
+  std::memcpy(this, buffer.data(), sizeof(*this));
   pdu_id = be32toh(pdu_id);
   pdu_payload_length = be32toh(pdu_payload_length);
   // e2e_header is always FF
@@ -94,8 +97,8 @@ void EgoVehicleData::betoh()
 }
 
 SensorFeedback::SensorFeedback(const std::array<uint8_t, kPduSize> & buffer)
-: SensorFeedback(std::bit_cast<SensorFeedback>(buffer))
 {
+  std::memcpy(this, buffer.data(), sizeof(*this));
   pdu_id = be32toh(pdu_id);
   pdu_payload_length = be32toh(pdu_payload_length);
   // e2e_header is always FF
@@ -108,8 +111,8 @@ SensorFeedback::SensorFeedback(const std::array<uint8_t, kPduSize> & buffer)
 }
 
 SensorStateInformation::SensorStateInformation(const std::array<uint8_t, kPduSize> & buffer)
-: SensorStateInformation(std::bit_cast<SensorStateInformation>(buffer))
 {
+  std::memcpy(this, buffer.data(), sizeof(*this));
   pdu_id = be32toh(pdu_id);
   pdu_payload_length = be32toh(pdu_payload_length);
   // e2e_header is always FF
@@ -154,8 +157,8 @@ void SensorBroadcastData::betoh()
 }
 
 SensorBroadcast::SensorBroadcast(const std::array<uint8_t, kPduSize> & buffer)
-: SensorBroadcast(std::bit_cast<SensorBroadcast>(buffer))
 {
+  std::memcpy(this, buffer.data(), sizeof(*this));
   pdu_id = be32toh(pdu_id);
   pdu_payload_length = be32toh(pdu_payload_length);
   BroadCast_LgpVer = be32toh(BroadCast_LgpVer);
@@ -318,8 +321,8 @@ void LocAtr_MountingPosition::betoh()
 }
 
 LocationAttributes::LocationAttributes(const std::array<uint8_t, kPduSize> & buffer)
-: LocationAttributes(std::bit_cast<LocationAttributes>(buffer))
 {
+  std::memcpy(this, buffer.data(), sizeof(*this));
   pdu_id = be32toh(pdu_id);
   pdu_payload_length = be32toh(pdu_payload_length);
   // e2e_header is always FF
@@ -331,8 +334,8 @@ LocationAttributes::LocationAttributes(const std::array<uint8_t, kPduSize> & buf
 
 
 SensorDTCInformation::SensorDTCInformation(const std::array<uint8_t, kPduSize> & buffer)
-: SensorDTCInformation(std::bit_cast<SensorDTCInformation>(buffer))
 {
+  std::memcpy(this, buffer.data(), sizeof(*this));
   pdu_id = be32toh(pdu_id);
   pdu_payload_length = be32toh(pdu_payload_length);
   // e2e_header is always FF

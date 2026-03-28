@@ -14,7 +14,11 @@
 
 #pragma once
 
+#if __has_include(<endian.h>)
 #include <endian.h>
+#elif __has_include(<net/netbyte.h>)
+#include <net/netbyte.h>
+#endif
 
 #include <cstdint>
 #include <limits>
@@ -78,7 +82,12 @@ static_assert(sizeof(float) == sizeof(uint32_t), "32-bit floating point required
  */
 inline float be32tohf(float in)
 {
-  return std::bit_cast<float>(be32toh(std::bit_cast<uint32_t>(in)));
+  uint32_t tmp;
+  std::memcpy(&tmp, &in, sizeof(tmp));
+  tmp = be32toh(tmp);
+  float result;
+  std::memcpy(&result, &tmp, sizeof(result));
+  return result;
 }
 
 /**
@@ -89,7 +98,12 @@ inline float be32tohf(float in)
  */
 inline float htobe32f(float in)
 {
-  return std::bit_cast<float>(htobe32(std::bit_cast<uint32_t>(in)));
+  uint32_t tmp;
+  std::memcpy(&tmp, &in, sizeof(tmp));
+  tmp = htobe32(tmp);
+  float result;
+  std::memcpy(&result, &tmp, sizeof(result));
+  return result;
 }
 
 /**
