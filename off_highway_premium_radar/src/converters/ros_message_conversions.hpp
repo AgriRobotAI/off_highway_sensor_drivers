@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <numbers>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -51,7 +50,7 @@ namespace off_highway_premium_radar
 
 using namespace off_highway_premium_radar_msgs;  // NOLINT
 
-static constexpr double kDegToRad = std::numbers::pi / 180.0;
+static constexpr double kDegToRad = M_PI / 180.0;
 static constexpr double kRadToDeg = 1.0 / kDegToRad;
 
 // To ROS message
