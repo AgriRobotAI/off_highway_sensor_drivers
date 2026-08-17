@@ -48,7 +48,7 @@ protected:
     off_highway_premium_radar::EgoVehicleInput rec_ref_ego_vehicle_data_);
   auto to_msg(const off_highway_premium_radar::VehicleData & d);
 
-  static constexpr double kDegToRad = std::numbers::pi / 180.0;
+  static constexpr double kDegToRad = M_PI / 180.0;
 
   off_highway_premium_radar::VehicleData ref_ego_vehicle_data_;
   off_highway_premium_radar::EgoVehicleInput rec_ego_vehicle_data_;

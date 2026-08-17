@@ -102,7 +102,7 @@ protected:
 
   std::shared_ptr<NodeWithDefaultConverter> node_;
   rclcpp::Node::SharedPtr sensor_pub_node_;
-  rclcpp::Publisher<MsgType>::SharedPtr sensor_publisher_;
+  typename rclcpp::Publisher<MsgType>::SharedPtr sensor_publisher_;
 
   rclcpp::executors::SingleThreadedExecutor executor_;
 };

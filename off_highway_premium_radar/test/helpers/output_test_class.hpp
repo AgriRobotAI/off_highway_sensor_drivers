@@ -103,7 +103,7 @@ protected:
 
   std::shared_ptr<NodeWithDefaultConverter> node_;
   rclcpp::Node::SharedPtr sensor_sub_node_;
-  rclcpp::Subscription<MsgType>::SharedPtr sensor_subscription_;
+  typename rclcpp::Subscription<MsgType>::SharedPtr sensor_subscription_;
   MsgType received_msg_;
 
   std::promise<bool> promise_;
