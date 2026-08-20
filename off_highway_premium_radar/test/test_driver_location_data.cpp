@@ -189,28 +189,6 @@ void compareFields(
   EXPECT_EQ(received.LocData_MeasStat_i_j, ref.LocData_MeasStat_i_j);
 }
 
-void checkNaNFields(
-  const off_highway_premium_radar::LocData_Packet_i_j & received,
-  const off_highway_premium_radar::LocData_Packet_i_j & ref)
-{
-  EXPECT_TRUE(std::isnan(received.LocData_RadDist_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_RadRelVel_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_AziAng_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_EleAng_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_Rcs_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_Snr_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_RadDistVar_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_RadRelVelVar_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_VarAzi_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_VarEle_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_DistVelCov_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_ProVelRes_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_ProAziAng_i_j));
-  EXPECT_TRUE(std::isnan(received.LocData_ProEleAng_i_j));
-  EXPECT_EQ(received.LocData_IdAngAmb_i_j, 0xFFFF);
-  EXPECT_EQ(received.LocData_MeasStat_i_j, ref.LocData_MeasStat_i_j);
-}
-
 void TestRadarDriver::verify_locations(
   std::vector<off_highway_premium_radar::LocationDataPdu> ref_locations,
   bool check_sna)
@@ -243,32 +221,33 @@ void TestRadarDriver::verify_locations(
     return;
   }
 
-  // Count expected valid locations (only those with LocData_MeasStat_i_j != 0)
+  // A location is a genuine detection only if it is not an SNA placeholder and its range
+  // check passed.
+  auto is_valid = [](const off_highway_premium_radar::LocData_Packet_i_j & p) {
+      return p.LocData_MeasStat_i_j != 0xFFFF && (p.LocData_MeasStat_i_j & 0x01U) != 0U;
+    };
+
   uint32_t expected_valid_locations = 0;
   for (const auto & ref_location : ref_locations) {
     for (const auto & loc_data_packet : ref_location.loc_data_packets) {
-      if (loc_data_packet.LocData_MeasStat_i_j != 0) {
+      if (is_valid(loc_data_packet)) {
         expected_valid_locations++;
       }
     }
   }
   EXPECT_EQ(received_location_data_.size(), expected_valid_locations);
 
+  // SNA placeholders must not be published at all, so there is nothing to compare against.
+  if (check_sna) {
+    return;
+  }
+
   uint32_t rec_loc_index = 0;
-  if (!check_sna) {
-    for (const auto & ref_location : ref_locations) {
-      for (const auto & loc_data_packet : ref_location.loc_data_packets) {
-        // Check if this reference location should be present in received data
-        if (loc_data_packet.LocData_MeasStat_i_j != 0) {
-          compareFields(received_location_data_[rec_loc_index], loc_data_packet);
-          rec_loc_index++;
-        }
-      }
-    }
-  } else {
-    for (const auto & ref_location : ref_locations) {
-      for (const auto & loc_data_packet : ref_location.loc_data_packets) {
-        checkNaNFields(received_location_data_[rec_loc_index], loc_data_packet);
+  for (const auto & ref_location : ref_locations) {
+    for (const auto & loc_data_packet : ref_location.loc_data_packets) {
+      // Check if this reference location should be present in received data
+      if (is_valid(loc_data_packet)) {
+        compareFields(received_location_data_[rec_loc_index], loc_data_packet);
         rec_loc_index++;
       }
     }

@@ -84,8 +84,13 @@ LocationData LocationDataHandler::assemble()
     LocationDataPdu data_pdu{pdu};
 
     for (auto & loc_data_packet : data_pdu.loc_data_packets) {
-      if ((!loc_data_packet.LocData_MeasStat_i_j) & 1U) {
-        // Measured and range check was not passed, skip this location
+      const auto measurement_status = loc_data_packet.LocData_MeasStat_i_j;
+      // A packet holds a fixed 16 slots, so the sensor fills the unused slots of the last
+      // package with the SNA value 0xFFFF. Admitting such a slot would both emit a NaN point
+      // and consume one unit of the LocData_NumLoc budget below, dropping a measured location
+      // at the tail of the PDU sequence.
+      if (measurement_status == 0xFFFFU || (measurement_status & 0x01U) == 0U) {
+        // Unmeasured placeholder, or range check was not passed, skip this location
         continue;
       }
 
